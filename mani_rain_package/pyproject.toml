@@ -1,0 +1,20 @@
+[project]
+name = "mani_rain"
+version = "0.1.0"
+authors = [
+  { name="Jonas Jakobsen", email="jojako21@student.aau.dk" },
+]
+description = "Rain prediction and link budgeting, for a lunar orbiter, using ESA DSA"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "matplotlib",
+  "numpy",
+  "itur",
+]
+
