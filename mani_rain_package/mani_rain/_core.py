@@ -1,8 +1,9 @@
 import pickle
 import numpy as np
 C = 3e8 # Speed of light
+k_boltz = 1.3806e-23 # Boltzmanns constant
 class station_t:
-    """Data class, for a ground station instance"""
+    """Class, for ground station instance"""
 
     def __init__(self,
                  lat: float, 
@@ -12,6 +13,7 @@ class station_t:
                  gt: float,
                  diamaeter: float,
                  eff: float = 0.65,
+                 tb_est: float = 150
                  ):
         """Parameters
         -----
@@ -29,6 +31,8 @@ class station_t:
           Diameter of dish in [m]
         eff : float
           Antenna efficiency in range (0;1]
+        tb_est : float
+          Estimated brightness temperature at G/T measurement
         """
         self.lat = lat
         self.lon = lon
@@ -39,6 +43,7 @@ class station_t:
         self.diameter = diamaeter
         self.gt = gt
         self.eff = eff
+        self.tb = tb_est
         self.gain = self._est_gain()
         self.t_sys = self._est_system_temp()
     
@@ -61,12 +66,23 @@ class station_t:
     
     def _est_system_temp(self):
         """Calculates the eqv system temperature based on G/T
-        and estimated gain."""
+        and estimated gain. The brightness temperature has been removed
+        """
         g_lin = 10**(self.gain/10)
         gt_lin = 10**(self.gt/10)
 
         sys_temp = g_lin/gt_lin
-        return sys_temp
+        return sys_temp - self.tb
+    
+    def eff_gt(self, t_ant: float):
+        """Calculates the equivalent G/T, for another brightness/
+        antenna temperature"""
+        g_lin = 10**(self.gain/10)
+        t_sys = t_ant + self._est_system_temp()
+        
+        gt_eqv_lin = g_lin / t_sys
+        return 10*np.log10(gt_eqv_lin)
+        
 
 _esa_dsa_eff = 0.65        
 cebreros = station_t (
@@ -74,7 +90,7 @@ cebreros = station_t (
     -4.367822163003614,
     0.727 + 0.04, # Ground height, and attenna height
     32, 
-    42.6,
+    55.8,
     35,
     _esa_dsa_eff)
 
@@ -83,7 +99,7 @@ malargue = station_t (
     -69.04629959947883,
     0.787+0.04,
     32,
-    42.6,
+    55.8,
     35,
     _esa_dsa_eff)
 
@@ -92,7 +108,11 @@ new_norcia = station_t (
     116.19856261578303,
     0.221+0.04,
     32,
-    42.6,
+    55.8,
     35,
     _esa_dsa_eff)
 
+mani_link = [
+    42.6, # dbi G_T
+    10, #dBW p_t
+]
