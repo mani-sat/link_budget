@@ -1,3 +1,4 @@
+from multiprocessing import Value
 import pickle
 import numpy as np
 C = 3e8 # Speed of light
@@ -47,14 +48,20 @@ class station_t:
         self.gain = self._est_gain()
         self.t_sys = self._est_system_temp()
     
-    def el_dist(self, file: str, res = 0.1):
+    def gen_el_dist(self, el_arr: np.ndarray = None,
+                file: str = "", res = 0.1):
         """Generate a Elevation distribution from pickled Godot file w.
         resolution `res` in [Deg]"""
-        with open(file, "rb") as f:
-            el = np.array(pickle.loads(f.read())[1])
-        
-        bin_count = int((el.max() - el.min())/res)
-        val, bins = np.histogram(el, bin_count, weights=np.ones_like(el)/len(el))
+
+        if el_arr is None:
+            if file == "":
+                raise ValueError("Missing Data")
+            with open(file, "rb") as f:
+                el_arr = pickle.loads(f.read())
+                
+        bin_count = int((el_arr.max() - el_arr.min())/res)
+        val, bins = np.histogram(el_arr, bin_count,
+                                 weights=np.ones_like(el_arr)/len(el_arr))
         self.el_distribution = (bins[:-1], val)
 
     def _est_gain(self):
@@ -115,5 +122,7 @@ new_norcia = station_t (
 mani_link = [
     42.6, # dbi G_T
     10, #dBW p_t
+    -1, # Gaseous Attenuation
+    -0.5, # Other Attenuation, as pointing
 ]
 """Constant values in the mani to ground link"""
