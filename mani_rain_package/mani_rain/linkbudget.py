@@ -43,21 +43,56 @@ class _link_budget:
         return self.bw*np.log2(1 + 10**(snr_db/10))
     
     def shannon_power_at_cap(self, rate: int):
-        """Returns the SNR in dB required to transmit at `rate`"""
+        """Returns the SNR in dB required to transmit at `rate` [bps]"""
 
         snr_lin = 2**(rate/self.bw) - 1
         return 10*np.log10(snr_lin)
 
     def snr_at_t(self, dist, elevation, rain_rate = None):
-        """Calculate the snr at time t"""
+        """Calculate the snr at time t
+        
+        Parameters
+        ----
+        dist : float
+          Distance from GS to SC in metres
+        elevation : float
+          Elevation angle in degree
+        rain_rate : None | float
+          Rain rate in mmhr⁻¹ defaults to eqv rain_rate of ITU
+          outage probability
+
+        Returns 
+        -----
+        snr : float
+          snr in dB
+        """
         raise NotImplementedError()
     
     def snr_eqv(self, dist, rain_rate = None):
-        """Calculate the eqv snr, for a given rain_rate"""
+        """Calculate the eqv snr, for a given rain_rate
+
+        The ground stations effective elevation distribtuion is
+        used to find the eqv snr over all elevations.
+        
+        Parameters
+        -----
+        dist : float
+          Distrance from GS to SC in metres
+        rain_rate : float
+          Rain rate in mmhr⁻¹, defaults to eqv rain_rate of
+          ITU outage probability
+
+        Returns
+        -----
+        snr : float
+          Eqv. SNR in dB
+        """
         raise NotImplementedError()
     
 
 class link_budget_itu(_link_budget):
+    """Link budget class, based on the probabilistic ITU, class"""
+    
     def __init__(self, station, bw, constants = _core.mani_link,
                  link_margin=3, tb=220,
                  rain_model: rain_itu = None):

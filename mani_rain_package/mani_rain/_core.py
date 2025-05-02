@@ -116,3 +116,4 @@ mani_link = [
     42.6, # dbi G_T
     10, #dBW p_t
 ]
+"""Constant values in the mani to ground link"""
