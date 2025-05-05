@@ -4,6 +4,7 @@ Linkbudget module
 #%%
 import mani_rain._core as _core
 from mani_rain._core import station_t, C, k_boltz
+from mani_rain._dvbs2 import dvbs2
 from mani_rain.rain.itu import rain_itu
 import numpy as np
 
@@ -16,6 +17,7 @@ class _link_budget:
         self.constant = np.sum(constants)
         self._link_margin = link_margin
         self.tb = tb
+        self.dvb = dvbs2(self.bw, rolloff=0.1)
 
     @property
     def link_margin(self):
@@ -47,6 +49,13 @@ class _link_budget:
 
         snr_lin = 2**(rate/self.bw) - 1
         return 10*np.log10(snr_lin)
+    
+    def dvb_s2_cap(self, snr_db: float):
+        """Calculate the highest achievable rate using DVB-S2 with 
+        a given snr: `snr_db`"""
+        best_modcod = self.dvb.find_best_modcod(snr_db)
+        return self.dvb.rate(best_modcod)
+
 
     def snr_at_t(self, dist, elevation, rain_rate = None):
         """Calculate the snr at time t

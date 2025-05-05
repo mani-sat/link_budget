@@ -1,4 +1,3 @@
-from multiprocessing import Value
 import pickle
 import numpy as np
 C = 3e8 # Speed of light
