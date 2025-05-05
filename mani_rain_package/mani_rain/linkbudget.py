@@ -53,7 +53,10 @@ class _link_budget:
     def dvb_s2_cap(self, snr_db: float):
         """Calculate the highest achievable rate using DVB-S2 with 
         a given snr: `snr_db`"""
-        best_modcod = self.dvb.find_best_modcod(snr_db)
+        try:
+            best_modcod = self.dvb.find_best_modcod(snr_db)
+        except ValueError:
+            return 0
         return self.dvb.rate(best_modcod)
 
 

@@ -68,7 +68,8 @@ class dvbs2:
         
         best_modcod = self._modcods[0] #Default to slowest
         if best_modcod.esno > esno:
-            return None
+            raise ValueError(f"{esno} is below the minimum threshold "
+                             f"of {self._modcods[0].esno}")
 
         for modcod in self._modcods:
             if esno > modcod.esno:
