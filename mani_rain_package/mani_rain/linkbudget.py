@@ -6,6 +6,7 @@ import mani_rain._core as _core
 from mani_rain._core import station_t, C, k_boltz
 from mani_rain._dvbs2 import dvbs2
 from mani_rain.rain.itu import rain_itu
+from mani_rain.rain import markov_rain
 import numpy as np
 
 class _link_budget:
@@ -143,3 +144,70 @@ class link_budget_itu(_link_budget):
 
         snr_lin = power_t_lin / (k_boltz*self.bw)
         return 10*np.log10(snr_lin)
+    
+class link_budget_markov(_link_budget):
+    """Link budget class, based on experimental markov models"""
+
+    def __init__(self, station: _core.station_t, rain_model: markov_rain,
+                 bw, constants = _core.mani_link, link_margin=3, tb=220):
+        super().__init__(station, bw, constants, link_margin, tb)
+        self.rain_model = rain_model
+
+    def snr_eqv(self, dist, rain_rate = None):
+        """Calculate the eqv snr, for a given rain_rate
+
+        The ground stations effective elevation distribtuion is
+        used to find the eqv snr over all elevations.
+        
+        Parameters
+        -----
+        dist : float
+          Distrance from GS to SC in metres
+        rain_rate : float
+          Rain rate in mmhr⁻¹ if None is given, a random draw will be
+          made from the markov chain.
+
+        Returns
+        -----
+        snr : float
+          Eqv. SNR in dB
+        """
+        fspl = self._fspl(dist)
+        rain_att = self.rain_model.eqv_attenuation(rain_rate)
+        gt = self.station.eff_gt(self._antenna_temperature(rain_att))
+
+        power_t = self.constant - self.link_margin + gt - fspl - rain_att
+        power_t_lin = 10**(power_t/10)
+
+        snr_lin = power_t_lin / (k_boltz*self.bw)
+        return 10*np.log10(snr_lin)
+    
+    def snr_at_t(self, dist, elevation, rain_rate=None):
+        """Calculate the snr at time t
+        
+        Parameters
+        ----
+        dist : float
+          Distance from GS to SC in metres
+        elevation : float
+          Elevation angle in degree
+        rain_rate : None | float
+          Rain rate in mmhr⁻¹ if None is given, a random draw will be
+          made from the markov chain.
+
+        Returns 
+        -----
+        snr : float
+          snr in dB
+        """
+        fspl = self._fspl(dist)
+        rain_att = self.rain_model.attenuation_saunders(elevation, rain_rate)
+        gt = self.station.eff_gt(self._antenna_temperature(rain_att))
+
+        power_t = self.constant - self.link_margin + gt - fspl - rain_att
+        power_t_lin = 10**(power_t/10)
+
+        snr_lin = power_t_lin / (k_boltz*self.bw)
+        return 10*np.log10(snr_lin)
+            
+        

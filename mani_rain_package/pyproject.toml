@@ -1,6 +1,6 @@
 [project]
 name = "mani_rain"
-version = "0.3.3"
+version = "0.4.1"
 authors = [
   { name="Jonas Jakobsen", email="jojako21@student.aau.dk" },
 ]
@@ -17,3 +17,5 @@ dependencies = [
   "itur",
 ]
 
+[tool.setuptools.package-data]
+"mani_rain" = ["rain/models/*"]
