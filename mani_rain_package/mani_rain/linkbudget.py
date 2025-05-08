@@ -59,6 +59,15 @@ class _link_budget:
             return 0
         return self.dvb.rate(best_modcod)
 
+    def dvb_s2_fixed_rate(self, snr_db: float, target_rate: float) -> float:
+        """Finds the closest rate to the target rate, and checks if
+        the link is strong enough if not it will return 0"""
+        modcod = self.dvb.modcod_at_rate(target_rate)
+        if modcod.esno <= snr_db:
+            return self.dvb.rate(modcod)
+        else:
+            return 0
+
 
     def snr_at_t(self, dist, elevation, rain_rate = None):
         """Calculate the snr at time t

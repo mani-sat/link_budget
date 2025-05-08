@@ -77,6 +77,15 @@ class dvbs2:
                     best_modcod = modcod
 
         return best_modcod
+    
+    def modcod_at_rate(self, rate: int) -> dvb_modcod_t:
+        """Find the modcod closest to the target rate"""
+        spectral_eff = np.array([i.spectral_eff for i in self._modcods])
+
+        target_eff = rate/self.eff_bw
+        idx = np.argmin(np.abs(spectral_eff - target_eff))
+        return self._modcods[idx]
 
     def rate(self, modcod: dvb_modcod_t) -> float:
+        """Calculate the rate for a given modcod"""
         return modcod.spectral_eff * self.eff_bw
