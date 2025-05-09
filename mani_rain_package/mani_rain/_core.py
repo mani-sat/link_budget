@@ -118,6 +118,15 @@ new_norcia = station_t (
     35,
     _esa_dsa_eff)
 
+aalborg = station_t (
+    57.014,
+    9.986,
+    0.02,
+    32,
+    41.55,
+    5.6,
+    _esa_dsa_eff)
+
 mani_link = [
     42.6, # dbi G_T
     10, #dBW p_t
