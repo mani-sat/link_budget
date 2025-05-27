@@ -1,6 +1,6 @@
 [project]
 name = "mani_rain"
-version = "0.4.5"
+version = "0.4.6"
 authors = [
   { name="Jonas Jakobsen", email="jojako21@student.aau.dk" },
   { name="Rasmus Dybkjær", email="rdybkj21@student.aau.dk" },
